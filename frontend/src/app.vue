@@ -5,7 +5,6 @@
   <Header></Header>  <!--显示的是标题 JSTodo-->
   <Footer></Footer>  <!--显示的是作者做法 Written by AUTHER-->
   <Tod></Tod>    <!--显示的是接下来要做什么这个组件 -->
-  <test></test>
 
 
 </div>
@@ -15,15 +14,14 @@
 import Header from './todo/header.vue'
 import Footer from './todo/footer.jsx'
 import Tod from './todo/todo.vue'
-//import test from './todo/test.vue'
 
-export default {   
+
+export default {
   components:{
     Header,
     Footer,
     Tod,
-	//test
-  }
+  },
   
 }
 </script>

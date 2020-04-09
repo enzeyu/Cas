@@ -21,27 +21,35 @@
 			<td v-cloak>{{site.resp_code}}</td>
 			<td v-cloak>{{site.resp_time/1000000000}}</td>
 			<td v-cloak>{{site.domain}}</td>
-			<td v-cloak><a href="#" class="btn-gradient" οnclick="checkDarklinks()">check me</a></td>
+			<td v-cloak><button v-on:click="checkurl(site.request_url)">check me</button></td>
         </tr>
         </tbody>
     </table>
-
+	<Modal :show="show" :title="title" @hideModal="hideModal" @submit="submit">
+	    <p>{{dark_content}}</p>
+	</Modal>
 
   </section>
 </template>
 
 <script>
+import Modal from './Modal.vue'
 
-var backend_api = 'http://127.0.0.1:8081/geturls'
+var geturl_backend_api = 'http://127.0.0.1:8081/geturls'
+var darkcheck_backend_api = 'http://127.0.0.1:8081/darkchecks'
 
 export default {
   data() {
     return {
       todos: [],
+	  title: '暗链检测结果',
+	  show: false,
+	  dark_content : '',
     };
   },
-
-
+  components:{
+	Modal
+  },
   methods: {
     sendUrl(e) {
 		this.todos.unshift({   //向数组的开头添加一个或更多元素
@@ -49,14 +57,30 @@ export default {
       })
       var send_url = JSON.stringify(e.target.value.trim());
 	  e.target.value = '';   //加完将值清零
-	  this.$http.post(backend_api,{url:send_url},{emulateJSON:true}).then(response => {
+	  this.$http.post(geturl_backend_api,{url:send_url},{emulateJSON:true}).then(response => {
 		  this.todos = response.body.message;
 	  })
 	  
     },
-	checkDarklinks(e){
-		console
-	}
+	checkurl(e){
+		var unchecked_url = e;
+		this.$http.post(darkcheck_backend_api,{url:unchecked_url},{emulateJSON:true}).then(response => {
+		this.show = true
+		if(response.body.message!=""){
+			  this.dark_content = "存在暗链攻击!"
+		  }else{
+			  this.dark_content = "不存在暗链攻击!"
+		  }	  
+	  })
+	},
+	hideModal() {
+		// 取消弹窗回调
+	  this.show = false
+	},
+	submit() {
+	  // 确认弹窗回调
+	  this.show = false
+	}	  
   }
 };
 </script>
@@ -132,4 +156,5 @@ background: #FFF
 [v-cloak]{
   display:none;
 }
+
 </style>
