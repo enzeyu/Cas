@@ -75,8 +75,8 @@ func getUrls(html *goquery.Document, request dataobj.RequestItem) []dataobj.Requ
 	temp_url = append(temp_url,request.Url)
 	html.Find("a").Each(func(i int, selection *goquery.Selection) {  //此处选择器仍然可以优化
 		url, _ := selection.Attr("href")
+
 		url = parseUrls(url,request.Domain)    //对URL进行筛选
-		url = strings.Replace(url, "www.", "", 1)
 		if url != "" && url != request.Domain {
 			temp := dataobj.RequestItem{}
 			temp.Url = "http://" + url
@@ -101,7 +101,7 @@ func parseUrls(s string,domain string) string{
 	if err != nil{
 		return ""
 	}
-	if u.Host != "" &&  strings.Contains(u.Host, domain){
+	if u.Host != "" &&  domainMatch(u.Host, domain){
 		return u.Host
 	} else{
 		return ""
@@ -113,6 +113,41 @@ func preProcess(s string) string{
 	s = strings.Replace(s, "\t", "", -1)
 
 	return s
+}
+
+func domainMatch(main_s string,ass_s string)bool{
+	r_main_s := []rune(main_s)
+	r_ass_s  := []rune(ass_s)
+	num := 0.0
+	k := 1
+	if len(r_main_s)>len(r_ass_s){
+		for i:=len(r_ass_s)-1;i>0;i--{
+			j:=len(r_main_s)-k
+			if(r_main_s[j]==r_ass_s[i]){
+				num = num + 1.0
+			}
+			k = k+1
+		}
+		if(num/float64(len(r_ass_s))>0.8){
+			return true
+		}else{
+			return false
+		}
+	}else{
+		for i:=len(r_main_s)-1;i>0;i--{
+			j:=len(r_ass_s)-k
+			if(r_main_s[i]==r_ass_s[j]){
+				num = num + 1.0
+			}
+			k = k+1
+		}
+		if(num/float64(len(r_main_s))>0.8){
+			return true
+		}else{
+			return false
+		}
+	}
+	return false
 }
 
 func isExist(s string, array []string) bool{ //检查URL是否存在返回的列表里

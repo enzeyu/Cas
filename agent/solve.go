@@ -26,7 +26,7 @@ func Get_Result(context *gin.Context){
 	Wg.Wait()
 
 	//_, temp_res := request.Get_res(request.Url)
-	fmt.Println("reply_frontend",reply_frontend)
+	fmt.Println("reply_frontend",len(reply_frontend))
 	context.JSON(200, gin.H{"message": reply_frontend})
 	reply_frontend = []dataobj.ReponseItem{}
 }
